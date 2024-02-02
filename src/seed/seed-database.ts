@@ -7,6 +7,7 @@ async function main() {
         await prisma.productImage.deleteMany();
         await prisma.product.deleteMany();
         await prisma.category.deleteMany();
+        await prisma.user.deleteMany();
     // ]);
 
     // Categorias
@@ -52,6 +53,10 @@ async function main() {
         await prisma.productImage.createMany({
             data: imagesData
         });
+    });
+
+    await prisma.user.createMany({
+        data: initialData.user
     });
 }
 
