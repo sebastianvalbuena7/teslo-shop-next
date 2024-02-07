@@ -1,18 +1,19 @@
 'use client';
 
-import { useForm } from "react-hook-form";
-import clsx from 'clsx';
-import { Country } from "@/interfaces";
-import { useAddressStore } from "@/store";
 import { useEffect } from "react";
-import { deleteUserAddress, setUserAddress } from "@/actions";
+import { useForm } from "react-hook-form";
 import { useSession } from "next-auth/react";
+import clsx from 'clsx';
+import { useAddressStore } from "@/store";
+import { deleteUserAddress, setUserAddress } from "@/actions";
+import { Address, Country } from "@/interfaces";
+import { useRouter } from "next/navigation";
 
 interface FormInputs {
     firstName: string;
     lastName: string;
     address: string;
-    address2: string;
+    address2?: string;
     postalCode: string;
     city: string;
     country: string;
@@ -22,13 +23,18 @@ interface FormInputs {
 
 interface Props {
     countries?: Country[];
+    // El partial es de TS y le dice que todos los parametros de Address son opcionales
+    userStoreAddress?: Partial<Address>;
 }
 
-export const AddressForm = ({ countries }: Props) => {
+export const AddressForm = ({ countries, userStoreAddress = {} }: Props) => {
+    const router = useRouter();
+
     const { handleSubmit, register, formState: { isValid }, reset } = useForm<FormInputs>({
         defaultValues: {
-
-        }
+            ...userStoreAddress,
+            rememberAddress: false
+        }   
     });
 
     const { data: session } = useSession({
@@ -44,18 +50,38 @@ export const AddressForm = ({ countries }: Props) => {
         }
     }, [address]);
 
-    const onSubmit = (data: FormInputs) => {
-        setAddress(data);
-
+    const onSubmit = async (data: FormInputs) => {
         const { rememberAddress, ...rest } = data;
+
+        setAddress({
+            address: rest.address,
+            address2: rest.address2 ?? '',
+            city: rest.city,
+            country: rest.country,
+            firstName: rest.firstName,
+            lastName: rest.lastName,
+            phone: rest.phone,
+            postalCode: rest.postalCode
+        });
 
         if (data.rememberAddress) {
             // TODO: server action
-            setUserAddress(rest, session?.user?.email!);
+            await setUserAddress({
+                address: rest.address,
+                address2: rest.address2 ?? '',
+                city: rest.city,
+                country: rest.country,
+                firstName: rest.firstName,
+                lastName: rest.lastName,
+                phone: rest.phone,
+                postalCode: rest.postalCode
+            }, session?.user?.email!);
         } else {
             // TODO: server action
-            deleteUserAddress(session?.user?.email!);
+            await deleteUserAddress(session?.user?.email!);
         }
+
+        router.push('/checkout');
     }
 
     return (
@@ -151,7 +177,7 @@ export const AddressForm = ({ countries }: Props) => {
                             className="border-gray-500 before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-blue-gray-200 transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-blue-500 checked:bg-blue-500 checked:before:bg-blue-500 hover:before:opacity-10"
                             id="checkbox"
                             {...register('rememberAddress')}
-                            
+
                         />
                         <div className="pointer-events-none absolute top-2/4 left-2/4 -translate-y-2/4 -translate-x-2/4 text-white opacity-0 transition-opacity peer-checked:opacity-100">
                             <svg

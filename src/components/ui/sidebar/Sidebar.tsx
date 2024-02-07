@@ -103,7 +103,7 @@ export const Sidebar = () => {
                     <span className="ml-3 text-xl">Productos</span>
                 </Link>
 
-                <Link href='/' className="flex items-center mt-6 p-2 hover:bg-gray-100 rounded transition-all">
+                <Link href='/orders' className="flex items-center mt-6 p-2 hover:bg-gray-100 rounded transition-all">
                     <IoTicketOutline size={20} />
                     <span className="ml-3 text-xl">Ordenes</span>
                 </Link>
