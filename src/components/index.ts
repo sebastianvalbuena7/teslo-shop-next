@@ -1,7 +1,7 @@
 export { PageNotFound } from './ui/not-found/PageNotFound';
 export { TopMenu } from "./ui/top-menu/TopMenu";
 
-export * from './provider/Provider';
+export * from './providers/Providers';
 
 export { Title } from './ui/title/Title';
 export { ProductGrid } from './products/product-grid/ProductGrid';

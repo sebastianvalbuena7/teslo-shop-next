@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { inter } from "@/config/fonts";
 import "./globals.css";
-import { Provider } from "@/components";
+import { Providers } from "@/components";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 export const metadata: Metadata = {
   title: "Teslo | Shop",
@@ -16,9 +17,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Provider>
-          {children}
-        </Provider>
+        <PayPalScriptProvider
+          options={{
+            clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID ?? '',
+            intent: 'capture',
+            currency: 'USD'
+          }}
+        >
+          <Providers>
+            {children}
+          </Providers>
+        </PayPalScriptProvider>
       </body>
     </html>
   );
